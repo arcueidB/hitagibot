@@ -378,9 +378,11 @@ def search(method, http, query):
     post = http.request('GET', url, fields={'access_token': token})
     if post.status == 200:
         try:
-            return json.loads(post.data.decode('UTF-8'))
+            search_results = json.loads(post.data.decode('UTF-8'))
         except JSONDecodeError:
             return
+        if 'error' not in search_results:
+            return search_results
     return
 
 

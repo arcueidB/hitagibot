@@ -137,7 +137,7 @@ def unban_member(tg):
     username = None
     tg.unban_chat_member(user_id)
 
-    user_object = tg.get_chat_member()
+    user_object = tg.get_chat_member(user_id)
     if user_object and user_object['ok']:
         if 'user_name' in user_object['result']['user']:
             username = user_object['result']['user']['username']

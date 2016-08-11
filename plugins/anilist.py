@@ -406,9 +406,10 @@ def client_credentials(tg):
         result = json.loads(post.data.decode('UTF-8'))
     except JSONDecodeError:
         return post.status
+    expires = result['expires_in'] + int(time.time())
     tg.cursor.execute('DELETE FROM anilist_tokens WHERE grant_type="client_credentials"')
     tg.cursor.execute("INSERT INTO anilist_tokens(access_token, token_type, expires, grant_type) VALUES(%s, %s, "
-                      "FROM_UNIXTIME(%s), %s);", (result['access_token'], result['token_type'], result['expires'],
+                      "FROM_UNIXTIME(%s), %s);", (result['access_token'], result['token_type'], expires - 10,
                                                   "client_credentials"))
     return result['access_token']
 

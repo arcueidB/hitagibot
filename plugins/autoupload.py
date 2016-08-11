@@ -43,7 +43,6 @@ def upload_photo(tg):
     photo = Image.open(file_path)
     if get_exif(file_path):
         keyboard = tg.inline_keyboard_markup([[{'text': "View exif data", 'callback_data': "exif{}".format(file_id)}]])
-        print(keyboard)
     else:
         keyboard = None
     photo = resize_image(photo)
@@ -91,7 +90,7 @@ def get_exif(file_path):
         return
 
 def format_exif(exif_data):
-    exif = exif_data.decode("utf8")
+    exif = exif_data.decode("utf8", "ignore")
     split_exif = exif.split('\n')
     formatted_exif = ""
     for line in split_exif[1:]:

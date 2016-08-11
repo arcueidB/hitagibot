@@ -290,10 +290,13 @@ def route_callback_query(plugins, get_me, config, http, callback_query):
                                      http,
                                      plugin_data=plugin_data,
                                      callback_query=callback_query)
-            plugins[plugin_name].main(api_object)
         else:
-            inline_api_object = InlineCallbackQuery(database, config, http, callback_query)
-            plugins[plugin_name].main(inline_api_object)
+            api_object = InlineCallbackQuery(database, config, http, callback_query)
+        try:
+            plugins[plugin_name].main(api_object)
+        except Exception:
+            api_object = TelegramApi(database, get_me, plugin_name, config, http)
+            send_error_report(data, traceback.format_exc(), api_object)
         database.commit()
         database.close()
 
@@ -304,15 +307,20 @@ def route_inline_query(plugins, get_me, config, http, inline_query):
     https://core.telegram.org/bots/api#inlinequery
     """
     default_plugin = config['BOT_CONFIG']['default_inline_plugin']
+    query = str(inline_query['query'])
     for plugin_name, plugin in plugins.items():
         if hasattr(plugin, 'inline_arguments'):
             for argument in plugin.inline_arguments:
-                match = re.findall(str(argument), str(inline_query['query']))
+                match = re.findall(str(argument), query)
                 if match:
                     database = MySQLdb.connect(**config['DATABASE'])
                     inline_query['matched_regex'] = argument
                     inline_query['match'] = match[0]
-                    plugin.main(TelegramInlineAPI(database, get_me, plugin_name, config, http, inline_query))
+                    try:
+                        plugin.main(TelegramInlineAPI(database, get_me, plugin_name, config, http, inline_query))
+                    except Exception:
+                        api_object = TelegramApi(database, get_me, plugin_name, config, http)
+                        send_error_report(query, traceback.format_exc(), api_object)
                     database.commit()
                     database.close()
                     return
@@ -320,6 +328,17 @@ def route_inline_query(plugins, get_me, config, http, inline_query):
         database = MySQLdb.connect(**config['DATABASE'])
         inline_query['matched_regex'] = None
         inline_query['match'] = inline_query['query']
-        plugins[default_plugin].main(TelegramInlineAPI(database, get_me, plugin_name, config, http, inline_query))
+        try:
+            plugins[default_plugin].main(TelegramInlineAPI(database, get_me, plugin_name, config, http, inline_query))
+        except Exception:
+            api_object = TelegramApi(database, get_me, plugin_name, config, http)
+            send_error_report(query, traceback.format_exc(), api_object)
         database.commit()
         database.close()
+
+
+def send_error_report(recieved, error, api_object):
+    admin_list = api_object.config['BOT_CONFIG']['admins'].split(',')
+    for admin_id in admin_list:
+        message = "<b>Unhandled Exception</b>\n<b>Recieved:</b> {}\n\n<code>{}</code>".format(query, error)
+        api_object.send_message(message, chat_id=admin_id)

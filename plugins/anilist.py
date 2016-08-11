@@ -122,7 +122,7 @@ def return_anime_query(tg, query_start, query_end, default=False):
         search_results = json.loads(post.data.decode('UTF-8'))
     else:
         search_results = search('anime/search/{}', tg.http, tg.inline_query['match'])
-    return search_results[query_start:query_end] if search_results else list()
+    return search_results[query_start:query_end] if search_results and 'error' not in search_results else list()
 
 
 def return_manga_query(tg, query_start, query_end, default=False):
@@ -133,7 +133,7 @@ def return_manga_query(tg, query_start, query_end, default=False):
         search_results = json.loads(post.data.decode('UTF-8'))
     else:
         search_results = search('manga/search/{}', tg.http, tg.inline_query['match'])
-    return search_results[query_start:query_end] if search_results else list()
+    return search_results[query_start:query_end] if search_results and 'error' not in search_results else list()
 
 
 def return_character_query(tg, query_start, query_end, default=False):
@@ -141,7 +141,7 @@ def return_character_query(tg, query_start, query_end, default=False):
         search_results = None
     else:
         search_results = search('character/search/{}', tg.http, tg.inline_query['match'])
-    return search_results[query_start:query_end] if search_results else list()
+    return search_results[query_start:query_end] if search_results and 'error' not in search_results else list()
 
 
 def return_anime_result(tg):
@@ -217,7 +217,10 @@ def create_anime_box(tg, anime):
         thumb_url = anime['image_url_lge']
     else:
         thumb_url = "http://anilist.co/img/dir/anime/reg/noimg.jpg"
-    description = "{} {}".format(anime['airing_status'].title(), anime['type'])
+    if 'airing_status' in anime:
+        description = anime['airing_status'].title()
+    if 'type' in anime:
+        description += " " + anime['type']
     box = tg.inline_query_result_article(anime['title_romaji'],
                                          message_content,
                                          reply_markup=message['reply_markup'],

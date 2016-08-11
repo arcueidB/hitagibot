@@ -20,7 +20,7 @@ def main(tg):
             answer_reminder(tg)
         else:
             reminder_time = added_time(tg.message['match'][0], tg.message['match'][1])
-            if reminder_time:
+            if reminder_time and reminder_time <= 2147483647:
                 set_reminder(tg, reminder_time + tg.message['date'])
             else:
                 tg.send_message("Invalid Time :(")

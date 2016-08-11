@@ -26,10 +26,10 @@ def send_exif(tg):
     if 'username' in tg.callback_query['from']:
         identifier = "@{}".format(tg.callback_query['from']['username'])
     else:
-        identifier = "@{}".format(tg.callback_query['from']['first_name'])
+        identifier = "{}".format(tg.callback_query['from']['first_name'])
         if 'last_name' in tg.callback_query['from']:
             identifier += " {}".format(tg.callback_query['from']['last_name'])
-    message = "<code>{}\nRequested By    : {}</code>".format(get_exif(file_path), identifier)
+    message = "<code>{}\nRequested By    : </code>{}".format(get_exif(file_path), identifier)
     tg.send_message(message, reply_to_message_id=tg.callback_query['message']['message_id'])
 
 
@@ -86,7 +86,7 @@ def get_exif(file_path):
     try:
         output = subprocess.check_output(["exiv2", file_path])
         return format_exif(output)
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return
 
 def format_exif(exif_data):

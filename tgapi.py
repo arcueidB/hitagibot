@@ -27,14 +27,7 @@ class TelegramApi(object):
     API Object for standard telegram messages
     """
 
-    def __init__(self,
-                 database,
-                 get_me,
-                 plugin_name,
-                 config,
-                 http,
-                 message=None,
-                 plugin_data=None,
+    def __init__(self, database, get_me, plugin_name, config, http, message=None, plugin_data=None,
                  callback_query=None):
         self.database = database
         self.cursor = self.database.cursor()

@@ -18,9 +18,10 @@ def main(tg_api):
         if tg.message['chat']['type'] != 'private':
             keyboard = create_plugin_keyboard()
             if check_if_mod() or check_if_admin():
-                tg.send_message("Here are a list of plugins and their status. Only admins can "
-                                "toggle these",
-                                reply_markup=tg.inline_keyboard_markup(keyboard))
+                tg.send_message(
+                    "Here are a list of plugins and their status. Only admins can "
+                    "toggle these",
+                    reply_markup=tg.inline_keyboard_markup(keyboard))
             else:
                 tg.send_message("Only admins can manage plugins!")
         else:
@@ -36,8 +37,8 @@ def answer_callback():
     if updated:
         tg.answer_callback_query("Toggled the plugin status!")
         keyboard = create_plugin_keyboard()
-        tg.edit_message_reply_markup(message_id=tg.callback_query['message']['message_id'],
-                                     reply_markup=tg.inline_keyboard_markup(keyboard))
+        tg.edit_message_reply_markup(
+            message_id=tg.callback_query['message']['message_id'], reply_markup=tg.inline_keyboard_markup(keyboard))
     elif updated is False:
         tg.answer_callback_query("Only the bot admin can toggle this plugin!")
     else:

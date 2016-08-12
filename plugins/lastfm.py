@@ -56,9 +56,10 @@ def handle_message(tg, api_key):
             else:
                 top_artists(tg, api_key, first_name, lastfm_name)
         else:
-            tg.send_message("It seems {} LastFM hasn't been linked\n"
-                            "Reply with your LastFM to link it!".format(determiner),
-                            flag_message=True)
+            tg.send_message(
+                "It seems {} LastFM hasn't been linked\n"
+                "Reply with your LastFM to link it!".format(determiner),
+                flag_message=True)
 
 
 def handle_inline_query(tg, api_key):
@@ -78,10 +79,8 @@ def handle_inline_query(tg, api_key):
         concurrent.futures.wait(futures)
         offset = page + 1 if len(track_list) == 14 else ''
         is_personal = False if '(.*)' in tg.inline_query['matched_regex'] else True
-        tg.answer_inline_query([box.result() for box in futures],
-                               is_personal=is_personal,
-                               cache_time=15,
-                               next_offset=offset)
+        tg.answer_inline_query(
+            [box.result() for box in futures], is_personal=is_personal, cache_time=15, next_offset=offset)
 
 
 def create_track_result(tg, track, lastfm_name, first_name):
@@ -98,12 +97,13 @@ def create_track_result(tg, track, lastfm_name, first_name):
     keyboard = create_keyboard(lastfm_name, track['song_url'])
     message_contents = tg.input_text_message_content(message)
     description = "{}\n{}".format(track['artist'], time_played)
-    return tg.inline_query_result_article(track['name'],
-                                          message_contents,
-                                          description=description,
-                                          reply_markup=tg.inline_keyboard_markup(keyboard),
-                                          thumb_url=track['image'],
-                                          parse_mode="None")
+    return tg.inline_query_result_article(
+        track['name'],
+        message_contents,
+        description=description,
+        reply_markup=tg.inline_keyboard_markup(keyboard),
+        thumb_url=track['image'],
+        parse_mode="None")
 
 
 def last_played(http, api_key, first_name, lastfm_name):

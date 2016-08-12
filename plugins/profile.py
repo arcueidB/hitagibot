@@ -39,9 +39,8 @@ def main(tg):
     else:
         message, keyboard = return_profile(tg)
         message_contents = tg.input_text_message_content(message)
-        box = tg.inline_query_result_article("Share your profile!",
-                                             message_contents,
-                                             reply_markup=tg.inline_keyboard_markup(keyboard))
+        box = tg.inline_query_result_article(
+            "Share your profile!", message_contents, reply_markup=tg.inline_keyboard_markup(keyboard))
         tg.answer_inline_query([box], is_personal=True, cache_time=60)
 
 

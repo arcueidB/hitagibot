@@ -221,11 +221,12 @@ def create_anime_box(tg, anime):
         description = anime['airing_status'].title()
     if 'type' in anime:
         description += " " + anime['type']
-    box = tg.inline_query_result_article(anime['title_romaji'],
-                                         message_content,
-                                         reply_markup=message['reply_markup'],
-                                         thumb_url=thumb_url,
-                                         description=description)
+    box = tg.inline_query_result_article(
+        anime['title_romaji'],
+        message_content,
+        reply_markup=message['reply_markup'],
+        thumb_url=thumb_url,
+        description=description)
     return box
 
 
@@ -237,11 +238,12 @@ def create_character_box(tg, character):
         description = "Character - {}".format(manga['name_japanese'])
     else:
         description = "Character"
-    box = tg.inline_query_result_article(title,
-                                         message_content,
-                                         reply_markup=message['reply_markup'],
-                                         thumb_url=character['image_url_lge'],
-                                         description=description)
+    box = tg.inline_query_result_article(
+        title,
+        message_content,
+        reply_markup=message['reply_markup'],
+        thumb_url=character['image_url_lge'],
+        description=description)
     return box
 
 
@@ -252,11 +254,12 @@ def create_manga_box(tg, manga):
         description = "{} {}".format(manga['publishing_status'].title(), manga['type'].title())
     else:
         description = "Manga"
-    box = tg.inline_query_result_article(manga['title_romaji'],
-                                         message_content,
-                                         reply_markup=message['reply_markup'],
-                                         thumb_url=manga['image_url_lge'],
-                                         description=description)
+    box = tg.inline_query_result_article(
+        manga['title_romaji'],
+        message_content,
+        reply_markup=message['reply_markup'],
+        thumb_url=manga['image_url_lge'],
+        description=description)
     return box
 
 

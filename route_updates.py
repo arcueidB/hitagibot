@@ -108,8 +108,9 @@ class RouteMessage(object):
             self.message['flagged_message'] = True
             self.cursor.execute("UPDATE flagged_messages SET currently_active=FALSE WHERE chat_id=%s", (chat_id, ))
             self.database.commit()
-            self.plugins[result['plugin_name']].main(TelegramApi(self.database, self.get_me, result['plugin_name'],
-                                                                 self.config, self.http, self.message, plugin_data))
+            self.plugins[result['plugin_name']].main(
+                TelegramApi(self.database, self.get_me, result['plugin_name'], self.config, self.http, self.message,
+                            plugin_data))
 
     def handle_plugins(self):
         """
@@ -283,13 +284,8 @@ def route_callback_query(plugins, get_me, config, http, callback_query):
         plugin_name = db_result['plugin_name']
         plugin_data = json.loads(db_result['plugin_data']) if db_result['plugin_data'] else None
         if 'message' in callback_query:
-            api_object = TelegramApi(database,
-                                     get_me,
-                                     plugin_name,
-                                     config,
-                                     http,
-                                     plugin_data=plugin_data,
-                                     callback_query=callback_query)
+            api_object = TelegramApi(
+                database, get_me, plugin_name, config, http, plugin_data=plugin_data, callback_query=callback_query)
         else:
             api_object = InlineCallbackQuery(database, config, http, callback_query)
         try:

@@ -28,8 +28,8 @@ def main(tg):
         tg.send_message("I can only upscale photos :(")
         return
     else:
-        tg.send_message("Send me the image you would like to upscale or reply to an image with /waifu2x",
-                        flag_message=True)
+        tg.send_message(
+            "Send me the image you would like to upscale or reply to an image with /waifu2x", flag_message=True)
         return
     if document:
         mime_type = document['mime_type']

@@ -28,8 +28,9 @@ def main(tg):
             else:
                 keyboard.append([button])
             remaining -= 1
-        tg.send_message("Here are a list of my functions.\nFor more detail you can use <code>/help plugin-name</code>",
-                        reply_markup=tg.inline_keyboard_markup(keyboard))
+        tg.send_message(
+            "Here are a list of my functions.\nFor more detail you can use <code>/help plugin-name</code>",
+            reply_markup=tg.inline_keyboard_markup(keyboard))
     else:
         grab_plugin(tg)
 

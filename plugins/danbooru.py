@@ -70,11 +70,8 @@ def create_box(tg, pic):
     keyboard[0].append({'text': "Download", 'url': pm_parameter})
     width = pic['image_width']
     height = pic['image_height']
-    return tg.inline_query_result_photo(image_url,
-                                        thumb_url,
-                                        photo_width=width,
-                                        photo_height=height,
-                                        reply_markup=tg.inline_keyboard_markup(keyboard))
+    return tg.inline_query_result_photo(
+        image_url, thumb_url, photo_width=width, photo_height=height, reply_markup=tg.inline_keyboard_markup(keyboard))
 
 
 def get_post(http, tags, page, api_key):

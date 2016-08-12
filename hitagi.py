@@ -131,21 +131,23 @@ def check_time_args():
             previous_message = json.loads(result['previous_message'])
             previous_message['time_id'] = time_id
             if 'message_id' in previous_message:
-                api_object = TelegramApi(database,
-                                         GET_ME,
-                                         plugin_name,
-                                         CONFIG,
-                                         flagged_time_http,
-                                         message=previous_message,
-                                         plugin_data=plugin_data)
+                api_object = TelegramApi(
+                    database,
+                    GET_ME,
+                    plugin_name,
+                    CONFIG,
+                    flagged_time_http,
+                    message=previous_message,
+                    plugin_data=plugin_data)
             else:
-                api_object = TelegramApi(database,
-                                         GET_ME,
-                                         plugin_name,
-                                         CONFIG,
-                                         flagged_time_http,
-                                         callback_query=previous_message,
-                                         plugin_data=plugin_data)
+                api_object = TelegramApi(
+                    database,
+                    GET_ME,
+                    plugin_name,
+                    CONFIG,
+                    flagged_time_http,
+                    callback_query=previous_message,
+                    plugin_data=plugin_data)
             cursor.execute('DELETE FROM `flagged_time` WHERE time_id=%s;', (time_id, ))
             try:
                 PLUGINS[plugin_name].main(api_object)

@@ -45,11 +45,8 @@ def create_box(tg, pic):
     keyboard = [[{'text': 'Source', 'url': sauce}]]
     width = int(pic['width'])
     height = int(pic['height'])
-    return tg.inline_query_result_photo(image_url,
-                                        thumb_url,
-                                        photo_width=width,
-                                        photo_height=height,
-                                        reply_markup=tg.inline_keyboard_markup(keyboard))
+    return tg.inline_query_result_photo(
+        image_url, thumb_url, photo_width=width, photo_height=height, reply_markup=tg.inline_keyboard_markup(keyboard))
 
 
 def get_images(http, query, limit=50, page=1):

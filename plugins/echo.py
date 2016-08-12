@@ -20,31 +20,23 @@ def main(tg):
     elif tg.inline_query:
         bold_message = "<b>{}</b>".format(tg.inline_query['match'])
         bold_contents = tg.input_text_message_content(bold_message)
-        bold = tg.inline_query_result_article("Bold",
-                                              bold_contents,
-                                              description=bold_message,
-                                              thumb_url="https://botnets.me/hitagi/bold.png")
+        bold = tg.inline_query_result_article(
+            "Bold", bold_contents, description=bold_message, thumb_url="https://botnets.me/hitagi/bold.png")
 
         italic_message = "<i>{}</i>".format(tg.inline_query['match'])
         italic_contents = tg.input_text_message_content(italic_message)
-        italic = tg.inline_query_result_article("Italic",
-                                                italic_contents,
-                                                description=italic_message,
-                                                thumb_url="https://botnets.me/hitagi/italic.png")
+        italic = tg.inline_query_result_article(
+            "Italic", italic_contents, description=italic_message, thumb_url="https://botnets.me/hitagi/italic.png")
 
         code_message = "<code>{}</code>".format(tg.inline_query['match'])
         code_contents = tg.input_text_message_content(code_message)
-        code = tg.inline_query_result_article("Code",
-                                              code_contents,
-                                              description=code_message,
-                                              thumb_url="https://botnets.me/hitagi/code.png")
+        code = tg.inline_query_result_article(
+            "Code", code_contents, description=code_message, thumb_url="https://botnets.me/hitagi/code.png")
 
         leet_message = leet_text(tg.inline_query['match'])
         leet_contents = tg.input_text_message_content(leet_message)
-        leet = tg.inline_query_result_article("1337",
-                                              leet_contents,
-                                              description=leet_message,
-                                              thumb_url="https://botnets.me/hitagi/1337.png")
+        leet = tg.inline_query_result_article(
+            "1337", leet_contents, description=leet_message, thumb_url="https://botnets.me/hitagi/1337.png")
 
         tg.answer_inline_query([bold, italic, code, leet], cache_time=0)
 

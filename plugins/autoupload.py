@@ -19,18 +19,22 @@ def main(tg):
 
 
 def send_exif(tg):
-    tg.answer_callback_query()
     file_id = tg.callback_query['data'].replace("exif", '')
     document_obj = tg.get_file(file_id)
     file_path = tg.download_file(document_obj)
-    if 'username' in tg.callback_query['from']:
-        identifier = "@{}".format(tg.callback_query['from']['username'])
+    message = "<code>{}</code>".format(get_exif(file_path))
+    if tg.callback_query['from']['id'] == tg.callback_query['message']['chat']['id']:
+        response_text = None
+        reply_to_id = tg.callback_query['message']['message_id']
     else:
-        identifier = "{}".format(tg.callback_query['from']['first_name'])
-        if 'last_name' in tg.callback_query['from']:
-            identifier += " {}".format(tg.callback_query['from']['last_name'])
-    message = "<code>{}\nRequested By    : </code>{}".format(get_exif(file_path), identifier)
-    tg.send_message(message, reply_to_message_id=tg.callback_query['message']['message_id'])
+        response_text = "I've sent you the exif data in a private message"
+        reply_to_id = None
+    response = tg.send_message(message, chat_id=tg.callback_query['from']['id'], reply_to_message_id=reply_to_id)
+    if response and response['ok']:
+        tg.answer_callback_query(response_text)
+    else:
+        tg.answer_callback_query(
+            "I was unable to send you the exif data. Try unblocking or messaging me", show_alert=True)
 
 
 def upload_photo(tg):
@@ -48,7 +52,11 @@ def upload_photo(tg):
     photo = resize_image(photo)
     photo = compress_image(photo)
     name = document_obj['result']['file_id'] + ".jpg"
-    tg.send_photo((name, photo.read()), disable_notification=True, reply_to_message_id=tg.message['message_id'], reply_markup=keyboard)
+    tg.send_photo(
+        (name, photo.read()),
+        disable_notification=True,
+        reply_to_message_id=tg.message['message_id'],
+        reply_markup=keyboard)
     photo.close()
 
 
@@ -56,7 +64,7 @@ def resize_image(image):
     """
     Resizes an image if its height or width > 1600. Uses lanczos downscaling.
     """
-    if image.size[0] >  1600 or image.size[1] > 1600:
+    if image.size[0] > 1600 or image.size[1] > 1600:
         larger = image.size[0] if image.size[0] > image.size[1] else image.size[1]
         scale = 1600 / larger
         new_dimensions = (int(image.size[0] * scale), int(image.size[1] * scale))
@@ -73,7 +81,7 @@ def compress_image(image):
     compressed_image = io.BytesIO()
     try:
         image.save(compressed_image, format='JPEG', quality=90)
-    except OSError: # For "cannot write mode P as JPEG"
+    except OSError:  # For "cannot write mode P as JPEG"
         to_rgb = image.convert('RGB')
         to_rgb.save(compressed_image, format='JPEG', quality=90)
         to_rgb.close()
@@ -88,6 +96,7 @@ def get_exif(file_path):
         return format_exif(output)
     except (subprocess.CalledProcessError, FileNotFoundError):
         return
+
 
 def format_exif(exif_data):
     exif = exif_data.decode("utf8", "ignore")

@@ -47,9 +47,10 @@ def opt_in(tg):
         except _mysql_exceptions.IntegrityError:
             tg.cursor.execute("UPDATE chat_opt_status SET status=1, toggle_user=%s, toggle_date=now()", (user_id, ))
         tg.answer_callback_query("You have opted in!")
-        tg.edit_message_text("You have successfully opted into stat collection."
-                             "You'll be able to see statistics shortly. Opt out at anytime using /chatstats opt-out",
-                             message_id=tg.callback_query['message']['message_id'])
+        tg.edit_message_text(
+            "You have successfully opted into stat collection."
+            "You'll be able to see statistics shortly. Opt out at anytime using /chatstats opt-out",
+            message_id=tg.callback_query['message']['message_id'])
     else:
         tg.answer_callback_query("Only moderators can enable chat stats!")
 
@@ -61,8 +62,9 @@ def opt_out(tg):
             tg.cursor.execute("UPDATE chat_opt_status SET status=FALSE AND toggle_user=%s AND toggle_date=now() WHERE "
                               "chat_id=%s", (tg.callback_query['from']['id'], chat_id))
             tg.answer_callback_query()
-            tg.edit_message_text("You have successfully disabled statistics. All chat data has been deleted.",
-                                 message_id=tg.callback_query['message']['message_id'])
+            tg.edit_message_text(
+                "You have successfully disabled statistics. All chat data has been deleted.",
+                message_id=tg.callback_query['message']['message_id'])
         else:
             tg.answer_callback_query("Only mods can disable stats!")
     elif tg.message:
@@ -75,8 +77,9 @@ def opt_out(tg):
         rows = query.fetch_row()
         if rows:
             keyboard = [[{'text': 'Disable & Remove Stats', 'callback_data': '%%toggle_off%%'}]]
-            tg.send_message("Are you sure you want to opt-out? All chat data is deleted, this is irreversible.",
-                            reply_markup=tg.inline_keyboard_markup(keyboard))
+            tg.send_message(
+                "Are you sure you want to opt-out? All chat data is deleted, this is irreversible.",
+                reply_markup=tg.inline_keyboard_markup(keyboard))
         else:
             tg.send_message("You aren't currently opted in")
     return

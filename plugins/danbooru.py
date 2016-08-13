@@ -129,7 +129,7 @@ def return_photo(http, photo_id):
             result = json.loads(request.data.decode('UTF-8'))
         except JSONDecodeError:
             return
-        return download_photo(http, result['large_file_url'], file_path)
+        return download_photo(http, result['file_url'], file_path)
 
 
 def download_photo(http, url, file_path):

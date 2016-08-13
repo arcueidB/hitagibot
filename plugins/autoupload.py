@@ -34,7 +34,7 @@ def send_exif(tg):
         tg.answer_callback_query(response_text)
     else:
         tg.answer_callback_query(
-            "I was unable to send you the exif data. Try unblocking or messaging me", show_alert=True)
+            "I was unable to send you the exif data. Message me if you haven't yet or unblock me :)", show_alert=True)
 
 
 def upload_photo(tg):

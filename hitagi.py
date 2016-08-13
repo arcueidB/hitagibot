@@ -7,7 +7,9 @@ of workers.
 
 import json
 import time
-from multiprocessing import Process, Queue, Value
+import queue
+import signal
+from multiprocessing import Process, Value, Queue
 from multiprocessing.dummy import Process as ThreadProcess
 
 import MySQLdb
@@ -48,10 +50,11 @@ def get_updates():
     Grabs updates from the telegram server and places each update in MESSAGE_QUEUE.
     https://core.telegram.org/bots/api#getupdates
     """
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     offset = 0
     url = "{}bot{}/getUpdates".format(BASE_URL, API_TOKEN)
     while RUNNING.value:
-        fields = {'offset': offset, 'limit': 100, 'timeout': 30}
+        fields = {'offset': offset, 'limit': 100, 'timeout': 10}
         try:
             update = HTTP.request('GET', url, fields)
         except urllib3.exceptions.HTTPError:
@@ -75,22 +78,27 @@ def process_updates():
     Decides which type the update is and routes it to the appropriate route_updates
     method and launches a thread for the run_extensions method.
     """
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     plugin_http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
     plugin_http.timeout = urllib3.Timeout(connect=1.0)
     plugin_http.retries = 3
     update_router = RouteMessage(PLUGINS, plugin_http, GET_ME, CONFIG)
     while RUNNING.value:
-        update = MESSAGE_QUEUE.get()
-        if update:
-            extension_thread = ThreadProcess(target=run_extensions, args=(update, ))
-            extension_thread.start()
-            if 'message' in update:
-                update_router.route_update(update['message'])
-            elif 'callback_query' in update:
-                route_callback_query(PLUGINS, GET_ME, CONFIG, plugin_http, update['callback_query'])
-            elif 'inline_query' in update:
-                route_inline_query(PLUGINS, GET_ME, CONFIG, plugin_http, update['inline_query'])
-            extension_thread.join()
+        try:
+            update = MESSAGE_QUEUE.get_nowait()
+        except queue.Empty:
+            continue
+        extension_thread = ThreadProcess(target=run_extensions, args=(update, ))
+        extension_thread.start()
+        if 'message' in update:
+            update_router.route_update(update['message'])
+        elif 'edited_message' in update:
+            update_router.route_update(update['edited_message'])
+        elif 'callback_query' in update:
+            route_callback_query(PLUGINS, GET_ME, CONFIG, plugin_http, update['callback_query'])
+        elif 'inline_query' in update:
+            route_inline_query(PLUGINS, GET_ME, CONFIG, plugin_http, update['inline_query'])
+        extension_thread.join()
         time.sleep(SLEEP_TIME)
 
 
@@ -169,17 +177,16 @@ def main():
     for i in range(0, int(CONFIG['BOT_CONFIG']['workers'])):
         worker_process.append(Process(target=process_updates))
         worker_process[i].start()
-    time_worker = Process(target=check_time_args)
+    time_worker = ThreadProcess(target=check_time_args)
     time_worker.start()
     while RUNNING.value:
-        time.sleep(30)
         for index, worker in enumerate(worker_process):
             if not worker.is_alive():
                 del worker_process[index]
                 worker_process.append(Process(target=process_updates))
                 worker_process[-1].start()
         if not time_worker.is_alive():
-            time_worker = Process(target=check_time_args)
+            time_worker = ThreadProcess(target=check_time_args)
             time_worker.start()
         if not get_update_process.is_alive():
             get_update_process = Process(target=get_updates)
@@ -191,4 +198,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\nShutting Down.....")
+        RUNNING.value = 0

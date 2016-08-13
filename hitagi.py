@@ -87,6 +87,7 @@ def process_updates():
         try:
             update = MESSAGE_QUEUE.get_nowait()
         except queue.Empty:
+            time.sleep(SLEEP_TIME)
             continue
         extension_thread = ThreadProcess(target=run_extensions, args=(update, ))
         extension_thread.start()
@@ -99,7 +100,6 @@ def process_updates():
         elif 'inline_query' in update:
             route_inline_query(PLUGINS, GET_ME, CONFIG, plugin_http, update['inline_query'])
         extension_thread.join()
-        time.sleep(SLEEP_TIME)
 
 
 def run_extensions(update):
@@ -180,6 +180,7 @@ def main():
     time_worker = ThreadProcess(target=check_time_args)
     time_worker.start()
     while RUNNING.value:
+        time.sleep(30)
         for index, worker in enumerate(worker_process):
             if not worker.is_alive():
                 del worker_process[index]

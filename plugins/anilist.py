@@ -235,7 +235,7 @@ def create_character_box(tg, character):
     message_content = tg.input_text_message_content(message['text'], parse_mode="markdown")
     title = "{} {}".format(character['name_first'], character['name_last'])
     if 'name_japanese' in character:
-        description = "Character - {}".format(manga['name_japanese'])
+        description = "Character - {}".format(character['name_japanese'])
     else:
         description = "Character"
     box = tg.inline_query_result_article(

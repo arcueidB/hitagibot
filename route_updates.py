@@ -336,5 +336,5 @@ def route_inline_query(plugins, get_me, config, http, inline_query):
 def send_error_report(recieved, error, api_object):
     admin_list = api_object.config['BOT_CONFIG']['admins'].split(',')
     for admin_id in admin_list:
-        message = "<b>Unhandled Exception</b>\n<b>Recieved:</b> {}\n\n<code>{}</code>".format(query, error)
+        message = "<b>Unhandled Exception</b>\n<b>Recieved:</b> {}\n\n<code>{}</code>".format(recieved, error)
         api_object.send_message(message, chat_id=admin_id)

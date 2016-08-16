@@ -5,6 +5,7 @@ Uploads a compressed version of uncompressed images.
 import io
 import subprocess
 import re
+import os
 from PIL import Image
 
 
@@ -92,7 +93,7 @@ def compress_image(image):
 
 def get_exif(file_path):
     try:
-        output = subprocess.check_output(["exiv2", file_path])
+        output = subprocess.check_output(["exiv2", file_path], stderr=open(os.devnull, 'w'))
         return format_exif(output)
     except (subprocess.CalledProcessError, FileNotFoundError):
         return

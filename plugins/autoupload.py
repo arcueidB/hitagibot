@@ -11,7 +11,7 @@ from PIL import Image
 
 def main(tg):
     """
-    Ignores gifs. Downloads an image, downscales, then uploads as a jpeg.
+    Uploads an image or sends exif data if a callback_query
     """
     if tg.message:
         upload_photo(tg)
@@ -20,6 +20,9 @@ def main(tg):
 
 
 def send_exif(tg):
+    """
+    Sends exif data to a user in a private message if possible
+    """
     file_id = tg.callback_query['data'].replace("exif", '')
     document_obj = tg.get_file(file_id)
     file_path = tg.download_file(document_obj)
@@ -39,6 +42,9 @@ def send_exif(tg):
 
 
 def upload_photo(tg):
+    """
+    Ignores gifs and uploads a photo resized to <= 1600*1600 and converted to jpeg
+    """
     if 'gif' in tg.message['document']['mime_type']:
         return
     file_id = tg.message['document']['file_id']
@@ -50,15 +56,18 @@ def upload_photo(tg):
         keyboard = tg.inline_keyboard_markup([[{'text': "View exif data", 'callback_data': "exif{}".format(file_id)}]])
     else:
         keyboard = None
-    photo = resize_image(photo)
-    photo = compress_image(photo)
+    resized_photo = resize_image(photo)
+    compressed_photo = compress_image(resized_photo)
     name = document_obj['result']['file_id'] + ".jpg"
-    tg.send_photo(
-        (name, photo.read()),
-        disable_notification=True,
-        reply_to_message_id=tg.message['message_id'],
-        reply_markup=keyboard)
+    if compressed_photo:
+        tg.send_photo(
+            (name, photo.read()),
+            disable_notification=True,
+            reply_to_message_id=tg.message['message_id'],
+            reply_markup=keyboard)
+        compressed_photo.close()
     photo.close()
+    resized_photo.close()
 
 
 def resize_image(image):
@@ -70,7 +79,6 @@ def resize_image(image):
         scale = 1600 / larger
         new_dimensions = (int(image.size[0] * scale), int(image.size[1] * scale))
         resized_image = image.resize(new_dimensions, Image.LANCZOS)
-        image.close()
         return resized_image
     return image
 
@@ -86,12 +94,16 @@ def compress_image(image):
         to_rgb = image.convert('RGB')
         to_rgb.save(compressed_image, format='JPEG', quality=90)
         to_rgb.close()
-    image.close()
+    except SyntaxError:
+        return
     compressed_image.seek(0)
     return compressed_image
 
 
 def get_exif(file_path):
+    """
+    Tries to use exiv2 to read exif data from a photo
+    """
     try:
         output = subprocess.check_output(["exiv2", file_path], stderr=open(os.devnull, 'w'))
         return format_exif(output)
@@ -100,6 +112,9 @@ def get_exif(file_path):
 
 
 def format_exif(exif_data):
+    """
+    Cleans up exiv2's output
+    """
     exif = exif_data.decode("utf8", "ignore")
     split_exif = exif.split('\n')
     formatted_exif = ""

@@ -217,9 +217,9 @@ def create_anime_box(tg, anime):
         thumb_url = anime['image_url_lge']
     else:
         thumb_url = "http://anilist.co/img/dir/anime/reg/noimg.jpg"
-    if 'airing_status' in anime:
+    if 'airing_status' in anime and anime['airing_status']:
         description = anime['airing_status'].title()
-    if 'type' in anime:
+    if 'type' in anime and anime['type']:
         description += " " + anime['type']
     box = tg.inline_query_result_article(
         anime['title_romaji'],
@@ -248,11 +248,12 @@ def create_character_box(tg, character):
 
 
 def create_manga_box(tg, manga):
+    print(manga['publishing_status'])
     message = manga_model(tg, manga['id'])
     message_content = tg.input_text_message_content(message['text'], parse_mode="markdown")
-    if 'publishing_status' in manga and 'type' in manga:
+    try:
         description = "{} {}".format(manga['publishing_status'].title(), manga['type'].title())
-    else:
+    except (AttributeError, KeyError):
         description = "Manga"
     box = tg.inline_query_result_article(
         manga['title_romaji'],

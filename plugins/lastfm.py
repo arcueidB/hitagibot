@@ -74,13 +74,16 @@ def handle_inline_query(tg, api_key):
     if lastfm_name:
         page = int(tg.inline_query['offset']) if tg.inline_query['offset'] else 1
         track_list = get_recently_played(tg.http, api_key, lastfm_name, 14, page=page)
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=8)
-        futures = [executor.submit(create_track_result, tg, track, lastfm_name, first_name) for track in track_list]
-        concurrent.futures.wait(futures)
-        offset = page + 1 if len(track_list) == 14 else ''
-        is_personal = False if '(.*)' in tg.inline_query['matched_regex'] else True
-        tg.answer_inline_query(
-            [box.result() for box in futures], is_personal=is_personal, cache_time=15, next_offset=offset)
+        if track_list:
+            executor = concurrent.futures.ThreadPoolExecutor(max_workers=8)
+            futures = [executor.submit(create_track_result, tg, track, lastfm_name, first_name) for track in track_list]
+            concurrent.futures.wait(futures)
+            offset = page + 1 if len(track_list) == 14 else ''
+            is_personal = False if '(.*)' in tg.inline_query['matched_regex'] else True
+            tg.answer_inline_query(
+                [box.result() for box in futures], is_personal=is_personal, cache_time=15, next_offset=offset)
+            return
+    tg.answer_inline_query([])
 
 
 def create_track_result(tg, track, lastfm_name, first_name):

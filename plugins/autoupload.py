@@ -61,7 +61,7 @@ def upload_photo(tg):
     name = document_obj['result']['file_id'] + ".jpg"
     if compressed_photo:
         tg.send_photo(
-            (name, photo.read()),
+            (name, compressed_photo.read()),
             disable_notification=True,
             reply_to_message_id=tg.message['message_id'],
             reply_markup=keyboard)

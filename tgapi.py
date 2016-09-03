@@ -485,6 +485,13 @@ class TelegramApi(object):
         bot_name = self.get_me['result']['username']
         return url.format(bot_name, parameter)
 
+    def admin_alert(self, message, forward_message=False):
+        admin_list = self.config['BOT_CONFIG']['admins'].split(',')
+        for admin_id in admin_list:
+            if forward_message:
+                self.forward_message(admin_id)
+            self.send_message(message, chat_id=admin_id)
+
 
 def reply_keyboard_markup(list_of_list_of_buttons, resize_keyboard=False, one_time_keyboard=False, selective=False):
     """

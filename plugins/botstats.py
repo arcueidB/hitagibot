@@ -32,10 +32,10 @@ def main(tg):
         result = query.fetch_row(maxrows=0)
         user_total = result[0][0]
 
-        message = "<code>Total Chats: {}".format(chat_total)
-        message += "\nTotal Users: {}".format(user_total)
-        message += "\nTracked Chats: {}".format(opted_in_count)
-        message += "\nMessage Count: {}".format(total_messages)
+        message = "<code>Total Chats: {:,}".format(chat_total)
+        message += "\nTotal Users: {:,}".format(user_total)
+        message += "\nTracked Chats: {:,}".format(opted_in_count)
+        message += "\nMessage Count: {:,}".format(total_messages)
         message += "\nUp for: {}</code>".format(parse_date(tg.get_me['date']))
 
         tg.send_message(message)

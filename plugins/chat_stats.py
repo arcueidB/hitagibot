@@ -89,7 +89,11 @@ def chat_stats(tg):
     total_messages, total_characters, average_chars, total_words = metrics(tg.database)
     message = "<b>Global Chat Statistics:</b>\n\n"
     message += "<b>Total Messages Sent:</b> {:,}".format(total_messages)
-    message += "\n<b>Total Characters Sent:</b> {:,}".format(total_characters)
+    try:
+        message += "\n<b>Total Characters Sent:</b> {:,}".format(total_characters)
+    except TypeError:
+        bug_report = "<b>Line 92 bug</b>\n\ntotal_characters: " + total_characters
+        tg.admin_alert(bug_report, forward_message=True)
     message += "\n<b>Average Characters Per Message:</b> {0:.1f}".format(average_chars)
 
     message += "\n\n<b>Types of Messages Sent</b>"

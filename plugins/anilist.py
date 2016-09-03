@@ -248,7 +248,6 @@ def create_character_box(tg, character):
 
 
 def create_manga_box(tg, manga):
-    print(manga['publishing_status'])
     message = manga_model(tg, manga['id'])
     message_content = tg.input_text_message_content(message['text'], parse_mode="markdown")
     try:
@@ -428,6 +427,9 @@ def clean_description(description):
         description = description[:description.rfind('\n')].replace('<br>', '')
         if len(description) > 300:
             description = description[:250] + "...."
+        if "~!" in description:
+            cut_off = description.index("~!")
+            description = description[:cut_off] + "(Spoilers hidden)"
         return html.unescape(description).replace('`', '\'')
 
 

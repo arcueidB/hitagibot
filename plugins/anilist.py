@@ -284,16 +284,16 @@ def anime_model(tg, anime_id):
         if 'studio' in anime:
             message += "\n*Studio:* "
             message += ", ".join([studio['studio_name'] for studio in anime['studio']])
-        message += "\n*Status:* {}".format(anime['airing_status'].title())
-        if 'airing_status' in anime:
-            if anime['airing_status'] == "currently airing":
-                episodes, hours = parse_date(anime)
-                message = message.format(hours)
-                if episodes > 1:
-                    message += "\n*Episode Count:* {}".format(episodes - 1)
-                    if anime['total_episodes']:
-                        message += "/{}".format(anime['total_episodes'])
-        elif 'total_episodes' in anime and anime['total_episodes']:
+        if 'airing_status' in anime and anime['airing_status']:
+            message += "\n*Status:* {}".format(anime['airing_status'].title())
+        if 'airing_status' in anime and anime['airing_status'] == "currently airing":
+            episodes, hours = parse_date(anime)
+            message = message.format(hours)
+            if episodes > 1:
+                message += "\n*Episode Count:* {}".format(episodes - 1)
+                if anime['total_episodes']:
+                    message += "/{}".format(anime['total_episodes'])
+        else:
             message += "\n*Episode Count:* {}".format(anime['total_episodes'])
 
         if 'start_date' in anime and anime['start_date']:
@@ -320,9 +320,11 @@ def anime_model(tg, anime_id):
 def character_model(tg, character_id, inline=False):
     character = get_model('character/{}', tg.http, character_id)
     if character:
-        message = "*{} {}*".format(character['name_first'], character['name_last'])
+        message = "*{}*".format(character['name_first'])
+        if 'name_last' in character and character['name_last']:
+            message += " *{}*".format(character['name_last'])
 
-        if character['name_alt']:
+        if 'name_alt' in character and character['name_alt']:
             message += "\n*Aliases:* {}".format(character['name_alt'])
 
         if 'image_url_banner' in character and character['image_url_banner']:
@@ -330,7 +332,7 @@ def character_model(tg, character_id, inline=False):
         elif 'image_url_lge' in character and character['image_url_lge']:
             message += '[​]({})'.format(character['image_url_lge'])
 
-        if character['info']:
+        if 'info' in character and character['info']:
             message += "\n\n{}".format(clean_description(character['info']))
 
         character_page = "http://anilist.co/character/{}".format(character['id'])

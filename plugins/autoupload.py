@@ -50,7 +50,10 @@ def upload_photo(tg):
     file_id = tg.message['document']['file_id']
     document_obj = tg.get_file(file_id)
     tg.send_chat_action('upload_photo')
-    file_path = tg.download_file(document_obj)
+    if document_obj['ok']:
+        file_path = tg.download_file(document_obj)
+    else:
+        return
     photo = Image.open(file_path)
     if get_exif(file_path):
         keyboard = tg.inline_keyboard_markup([[{'text': "View exif data", 'callback_data': "exif{}".format(file_id)}]])

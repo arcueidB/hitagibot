@@ -293,8 +293,12 @@ def anime_model(tg, anime_id):
                 message += "\n*Episode Count:* {}".format(episodes - 1)
                 if anime['total_episodes']:
                     message += "/{}".format(anime['total_episodes'])
-        else:
-            message += "\n*Episode Count:* {}".format(anime['total_episodes'])
+        elif 'total_episodes' in anime:
+            try:
+                if anime['total_episodes'] > 1:
+                    message += "\n*Episode Count:* {}".format(anime['total_episodes'])
+            except TypeError:
+                pass
 
         if 'start_date' in anime and anime['start_date']:
             air_season = determine_air_season(anime['start_date'])

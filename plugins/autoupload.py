@@ -75,11 +75,11 @@ def upload_photo(tg):
 
 def resize_image(image):
     """
-    Resizes an image if its height or width > 1600. Uses lanczos downscaling.
+    Resizes an image if its height or width > 2000. Uses lanczos downscaling.
     """
-    if image.size[0] > 1600 or image.size[1] > 1600:
+    if image.size[0] > 2000 or image.size[1] > 2000:
         larger = image.size[0] if image.size[0] > image.size[1] else image.size[1]
-        scale = 1600 / larger
+        scale = 2000 / larger
         new_dimensions = (int(image.size[0] * scale), int(image.size[1] * scale))
         resized_image = image.resize(new_dimensions, Image.LANCZOS)
         return resized_image
@@ -92,10 +92,10 @@ def compress_image(image):
     """
     compressed_image = io.BytesIO()
     try:
-        image.save(compressed_image, format='JPEG', quality=90)
+        image.save(compressed_image, format='JPEG', quality=100)
     except OSError:  # For "cannot write mode P as JPEG"
         to_rgb = image.convert('RGB')
-        to_rgb.save(compressed_image, format='JPEG', quality=90)
+        to_rgb.save(compressed_image, format='JPEG', quality=100)
         to_rgb.close()
     except SyntaxError:
         return

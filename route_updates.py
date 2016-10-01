@@ -29,7 +29,7 @@ class RouteMessage(object):
         self.http = http
         self.get_me = get_me
         self.config = config
-        self.executor = ThreadPoolExecutor(max_workers=4)
+        self.executor = ThreadPoolExecutor(max_workers=3)
         self.futures = list()
         self.message = None
         self.database = None
@@ -57,9 +57,10 @@ class RouteMessage(object):
             self.check_db_reply()
         elif not self.handle_plugins() and self.message['chat']['type'] == 'private':
             self.check_db_pm()
-        self.executor.shutdown(wait=True)
-        self.executor = ThreadPoolExecutor(max_workers=3)
-        self.futures = list()
+        if len(self.futures) == 3:
+            self.executor.shutdown(wait=True)
+            self.executor = ThreadPoolExecutor(max_workers=3)
+            self.futures = list()
         self.database.commit()
         self.database.close()
 

@@ -64,8 +64,6 @@ def create_box(tg, pic):
         return
     thumb_url = base_url + pic['preview_file_url']
     keyboard = [[]]
-    if 'source' in pic and pic['source']:
-        keyboard[0].append({'text': "Source", 'url': pic['source']})
     pm_parameter = tg.pm_parameter("danbooru" + str(pic['id']))
     keyboard[0].append({'text': "Download", 'url': pm_parameter})
     width = pic['image_width']

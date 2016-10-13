@@ -1,17 +1,17 @@
 # Hitagibot
 
-Hitagi is a plugin based Telegram bot written in Python 3 and licensed
+Hitagi is a plugin-based Telegram bot written in Python 3 and licensed
 under the GNU Affero General Public License v3. 
 
 ## Installation
-You will need python 3 (3.5.1 is recommended) to use the bot.
+You will need Python 3 (3.5.1 is recommended) to use the bot.
 
 First clone and cd to the repository
 ```sh
 git clone https://github.com/TopBakuhatsu/hitagibot.git
 cd hitagibot
 ```
-Give the plugin permission to execute
+Give the plugin permission to be executed
 ```sh
 chmod +x hitagi.py
 ```
@@ -29,5 +29,5 @@ token = YOUR TOKEN HERE
 * Some plugins may require separate tokens for their services
 * OSx users will need to install OpenSSL & Python3 from homebrew in order for the bot to function properly
 
-Now you can start the bot with `./hitagi.py`. Plugin documentation is
-available on the wiki for more advanced users.
+Now you can start the bot with `./hitagi.py`. Plugin documentation for more advanced users is
+available on the wiki.

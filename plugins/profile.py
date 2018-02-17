@@ -4,7 +4,7 @@ import json
 import os
 
 import _mysql_exceptions
-
+from urllib.parse import quote_plus as urlencode
 user_id = None
 entries = None
 try:
@@ -44,21 +44,22 @@ def main(tg):
         tg.answer_inline_query([box], is_personal=True, cache_time=60)
 
 
+
 def return_profile(tg):
     global user_id
     if tg.message:
         if 'reply_to_message' in tg.message:
-            first_name = tg.message['reply_to_message']['from']['first_name']
+            first_name = urlencode(tg.message['reply_to_message']['from']['first_name'])
         else:
-            first_name = tg.message['from']['first_name']
+            first_name = urlencode(tg.message['from']['first_name'])
     else:
-        first_name = tg.inline_query['from']['first_name']
+        first_name = urlencode(tg.inline_query['from']['first_name'])
     try:
         with open('data/profile/{}.json'.format(user_id)) as json_file:
             profile = json.load(json_file)
     except (JSONDecodeError, FileNotFoundError):
         profile = dict()
-    message = "<b>{}'s Profile</b>".format(first_name.title())
+    message = "<b>{}'s Profile</b>".format(urlencode(first_name.title()))
     misc_details = profile.pop('misc', None)
     keyboard = make_keyboard(profile)
     stats = get_stats(tg) if tg.message else None
@@ -66,9 +67,9 @@ def return_profile(tg):
         for field, value in misc_details.items():
             if field == 'bio':
                 continue
-            message += "\n<b>{}:</b> {}".format(field.title(), value)
+            message += "\n<b>{}:</b> {}".format(field.title(), urlencode(value))
         if "bio" in misc_details:
-            message += "\n<b>Bio:</b> {}".format(misc_details['bio'])
+            message += "\n<b>Bio:</b> {}".format(urlencode(misc_details['bio']))
     if stats:
         message += "\n<b>Total Messages:</b> {:,} ({})".format(stats['user_total'], stats['percentage'])
     try:
@@ -76,7 +77,7 @@ def return_profile(tg):
     except KeyError:
         playing = None
     if playing:
-        message += u"\n\U0001F3B6 {} - {}".format(playing['name'], playing['artist'])
+        message += u"\n\U0001F3B6 {} - {}".format(urlencode(playing['name']), urlencode(playing['artist']))
     if len(message.split('\n')) == 1 and not keyboard:
         message = "\nYour profile seems empty. You can add entries using:\n<code>/profile website username</code>"
     return message, keyboard
